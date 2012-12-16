@@ -8,11 +8,13 @@ def schedulejobs(metricfun):
             w, l = [int(x) for x in f.readline().split()]
             # Use of negative will make this a max heap.  Note that in
             # python tuples are compared element by element
-            heapq.heappush(h, (-metricfun(w,l), w, l))
+            heapq.heappush(h, (-metricfun(w,l), -w, l))
     wsum = 0
     totaltime = 0
     while(h):
         metric, w, l = heapq.heappop(h)
+        w = -w
+        metric = -metric
         totaltime += l
         # print totaltime
         # print("%i, %i" % (w, totaltime))
@@ -65,8 +67,8 @@ print schedulejobs(lambda w, l: w - l)
 
 # q2
 print "q2"
-print schedulejobs(lambda w, l: w/l)
+print schedulejobs(lambda w, l: float(w)/l)
 
 # q3
-print "q3"
-print prim()[1]
+# print "q3"
+# print prim()[1]
