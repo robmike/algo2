@@ -47,7 +47,7 @@ class DisjointSet(object):
 def cluster(nclusters = 4):
     h = []
     partitions = DisjointSet()
-    with open('clustering_small.txt', 'r') as f:
+    with open('clustering1.txt', 'r') as f:
         nvert = int(f.readline())
         # edges = recfromtxt(f, dtype=int, usemask=False)
         for line in f:
@@ -59,12 +59,21 @@ def cluster(nclusters = 4):
         while(h and partitions.count() > nclusters):
             elem = heapq.heappop(h)
             ecost, u, v = elem
+            # print elem
             if not partitions.sameset(u,v):
                 partitions.merge(u,v)
+                #print "different sets, merging"
+        # FIXME: Handle 1 cluster
+        # FIXME: Can h ever be empty for more than 1 cluster?
         if h:
-            separation, u, v = heapq.heappop(h)
+           while(h):
+              separation, u, v = heapq.heappop(h)
+              if not partitions.sameset(u,v):
+                 print separation, u, v
+                 break
         else:
             separation = ecost
+            print "error"
         return partitions, separation
 
 print "foo"
