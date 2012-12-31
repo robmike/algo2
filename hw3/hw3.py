@@ -33,7 +33,17 @@ def knapsack(infile='knapsack1.txt'):
                 else:
                     bestval[i][w] = max(bestval[lastidx][w], 
                                         bestval[lastidx][w - weight] + value)
-    return bestval[nitems-1][size]
+                # print i, w, value, weight, bestval[i][w]
+        opt_items = []
+        w = size
+        # for j,(value,weight) in enumerate(reversed(items)):
+        #    i = nitems - 1 - j
+        #    if i == 0:
+        #       if bestval[0][w] == value:
+        #          opt_items.append((value, weight))
+        #    if bestval[i][w] == bestval[i-1][w - weight] + value:
+        #       w -= weight
+        #       opt_items.append((value, weight))
 
     return bestval[nitems-1][size], opt_items
 
