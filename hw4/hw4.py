@@ -1,4 +1,6 @@
-import numpy as np
+from collections import defaultdict
+import progressbar as pb
+from math import isinf
 
 import pdb, sys
 # debug shit (from stackexchange)
@@ -17,37 +19,47 @@ def info(type, value, tb):
 
 sys.excepthook = info
 
+# Computes floyd-warshall all-pairs and then returns shortest
 def floydwarsh(infile='g1.txt'):
-    edges = {}
+    bestval = defaultdict(lambda: None)
     with open(infile, 'r') as f:
         nvert, nedges = [int(x) for x in f.readline().split()]
+        for i in xrange(nvert):
+            bestval[(i, i)] = 0
         for line in f:
             u, v, cost = [int(x) for x in line.split()]
-            edges[(u, v)] = cost
+            u, v = u - 1, v - 1 # Convert 1-indexed to 0-indexed
+            bestval[(u, v)] = cost
 
-    # initialize initial path costs to infinity except for paths from
-    # node to itself
-    bestval = np.inf*np.ones((nvert, nvert, nvert), dtype='int32')
-    for i in xrange(nvert):
-        bestval[i, i, 0] = 0
-    for (u,v), cost in edges.iteritems():
-        bestval[u, v, 0] = cost
+    
+    widgets = [pb.Percentage(), ' ', pb.Bar(), ' ', pb.ETA()]
+    pbar = pb.ProgressBar(widgets=widgets, maxval=nvert**2).start()
+    import pdb
+    for k in xrange(nvert):
+       for i in xrange(nvert):
+          for j in xrange(nvert):
+               # print i,j,k
+               # print "bestval[(i,k)]: " + repr(bestval[(i,k)])
+               # print "bestval[(k,j)]: " + repr(bestval[(k,j)])
+               if None not in [bestval[(i,k)], bestval[(k,j)]]:
+                  candidate = bestval[(i,k)] + bestval[(k,j)]
+                  if bestval[(i,j)] == None:
+                     bestval[(i,j)] = candidate
+                  else:
+                     bestval[(i,j)] = min(bestval[(i,j)], candidate)
+          pbar.update(k*nvert + i)
 
-    for i in xrange(nvert):
-        for j in xrange(nvert):
-            for k in xrange(nvert):
-                bestval[i,j,k] = min(bestval[i,j,k-1],
-                                     bestval[i,k,k-1] + bestval[k,j,k-1] + edges[(i,j)])
-
+    pbar.finish()
     # Check for negative cycle
     for i in xrange(nvert):
-        if bestval[i,i,nvert-1] < 0:
+        if bestval[(i,i)] < 0:
             return False
     
-    shortest = float('inf')
-    for i in xrange(nvert):
-        for j in xrange(nvert):
-            shortest = min(bestval[i, j, nvert-1], shortest)
+    shortest = min([cost for (u,v), cost in bestval.iteritems() if cost != None and u != v])
     return shortest
 
-floydwarsh()
+if __name__ == '__main__':
+   fname = sys.argv[1]
+   result = floydwarsh(fname)
+   print fname + ': ' + repr(result)
+
