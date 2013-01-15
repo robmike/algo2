@@ -31,20 +31,22 @@ def pairwisedist(locations):
 def tsp(infile='tsp.txt'):
     with open(infile, 'r') as f:
         nvert = [int(x) for x in f.readline().split()]
-        lastx, lasty = 0.0, 0.0
         locations = np.zeros((nvert, 2), dtype='float32')
+
+        # Rows: set membership (non-empty) described using binary encoding
+        # Columns: Last vertex in tour
         bestval = np.zeros((2**nvert, nvert), dtype='float32')
-        dist = np.zeros((nvert, nvert), dtype='float32')
-        bestval[1:,1] = np.finfo(np.float32).max
-        bestval[0,1] = 1.0
+
+        # Base case: Last vertex in tour is vertex 0. 0 if set
+        # consists only of first vertex. Infinity otherwise (Can't
+        # have starting vertex as last vertex in tour unless it is the only
+        # vertex in the tour).
+        bestval[1:,0] = np.finfo(np.float32).max
+        bestval[0,0] = 1.0
         for i, line in enumerate(f):
             locations[i,] = [float(x) for x in line.split()]
-            bigfloat += distance(locations[i,], locations[i-1,])
-            # for j in xrange(i, nvert):
-            #     # bah, we should use real symmetric matrices to save space
-            #     d = distance(locations[i,], locations[j,])
-            #     dist[i,j] = d
-            #     dist[j,i] = d
-        
 
-        bestval[bestval == 0] = bigfloat
+    dist = pairwisedist(locations)
+
+
+        
