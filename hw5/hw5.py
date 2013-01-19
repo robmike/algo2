@@ -150,4 +150,8 @@ if __name__ == '__main__':
    f = 'small.txt'
    if len(sys.argv) > 1:
       f = sys.argv[1]
-   print tsp(f)
+   result = tsp(f)
+   print(result)
+   with open('output.txt', 'w') as outf:
+      outf.write(str(result))
+   
