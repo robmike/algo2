@@ -85,7 +85,8 @@ def tsp(infile='tsp.txt'):
     maxsubset = scipy.misc.comb(nvert-1, (nvert-1)/2, exact=1)
     # Rows: m-elements sets containing zeroth vertex described using binary encoding
     # Columns: Last vertex in tour
-    bestval = np.zeros((maxsubset+1, nvert), dtype='float32')
+    bestval = np.empty((maxsubset+1, nvert), dtype='float32')
+    bestval[:] = BIGFLOAT32
 
     # Base case: Last vertex in tour is vertex 0. Cost = 0 if set
     # consists only of first vertex. Infinity otherwise (Can't have
@@ -105,7 +106,7 @@ def tsp(infile='tsp.txt'):
        # print "m=%i" % m
        prev_subsettable = m_subsettable
        m_subsettable = subsettable(nvert-1, m-1)
-       #print("Considering subsets of size %i" % m)
+       # print("Considering subsets of size %i" % m)
        for subset, sidx in sorted(m_subsettable.iteritems()):
           subset_elems = elements(subset)
           # print("Considering tours within the set")
@@ -140,7 +141,9 @@ def tsp(infile='tsp.txt'):
        bestval = temp
        # print prev_bestval
     pbar.finish()
-    return np.min(prev_bestval[0, 1:] + dist[1,1:]) # exclude starting vertex
+    # print dist[1,1:]
+    # print prev_bestval[0, 1:]
+    return np.min(prev_bestval[0, 1:] + dist[0,1:]) # exclude starting vertex
 
 if __name__ == '__main__':
    import sys
