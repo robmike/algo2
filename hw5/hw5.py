@@ -97,11 +97,12 @@ def tsp(infile='tsp.txt'):
     m_subsettable = {0 : 0}       # Set containing only 0th element has index 0
 
     widgets = [pb.Percentage(), ' ', pb.Bar(), ' ', pb.ETA()]
-    #pbar = pb.ProgressBar(widgets=widgets, maxval=nvert-1).start()
+    pbar = pb.ProgressBar(widgets=widgets, maxval=2**nvert-1).start()
+    progress_count = 0
     import pdb
     #pdb.set_trace()
     for m in xrange(2,nvert+1):
-       print "m=%i" % m
+       # print "m=%i" % m
        prev_subsettable = m_subsettable
        m_subsettable = subsettable(nvert-1, m-1)
        #print("Considering subsets of size %i" % m)
@@ -125,6 +126,9 @@ def tsp(infile='tsp.txt'):
              # print("Has value %.2f" % bv)
              # print(subset_elems)
 
+          progress_count += 1
+          pbar.update(progress_count)
+
        # when m > 2, row 0 no longer corresponds to the set consisting
        # only of the zero vertex. In all those cases we are not
        # allowed to have the 0 vertex as the "last" vertex.
@@ -134,9 +138,8 @@ def tsp(infile='tsp.txt'):
        temp = prev_bestval
        prev_bestval = bestval
        bestval = temp
-       #pbar.update(m-1)
        # print prev_bestval
-    #pbar.finish()
+    pbar.finish()
     return np.min(prev_bestval[0, 1:] + dist[1,1:]) # exclude starting vertex
 
 if __name__ == '__main__':
